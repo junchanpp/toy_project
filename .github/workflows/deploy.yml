@@ -56,7 +56,7 @@ jobs:
 
       # AWS에 연결해줍니다.
       - name: AWS 연결
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -78,7 +78,7 @@ jobs:
 
 
   check-deployment-status:
-    needs: build-docker
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: aws configure
