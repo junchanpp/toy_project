@@ -2,8 +2,8 @@ name: BackEnd - CI/CD
 
 on:
   push:
-    # main branch에 push(merge)될 경우 실행됩니다.
-    branches: [ "main" ]
+    tags:
+      - 'deploy-\d{6}-\d{4}'
 
 permissions:
   contents: read
