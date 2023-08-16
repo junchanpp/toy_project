@@ -3,7 +3,7 @@ name: BackEnd - CI/CD
 on:
   push:
     tags:
-      - 'deploy'
+      - 'deploy-.+-?(?:\d{6}-\d{4})?'
 
 permissions:
   contents: read
