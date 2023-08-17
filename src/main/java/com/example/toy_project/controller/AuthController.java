@@ -1,8 +1,10 @@
 package com.example.toy_project.controller;
+
 import com.example.toy_project.dto.LoginDto;
 import com.example.toy_project.dto.TokenDto;
 import com.example.toy_project.jwt.JwtFilter;
 import com.example.toy_project.jwt.TokenProvider;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,23 +18,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api/authenticate")
 @AllArgsConstructor
 public class AuthController {
+
   private final TokenProvider tokenProvider;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
 
-  @PostMapping("/api/authenticate")
+  @PostMapping("")
   public ResponseEntity<TokenDto> authorize(@Valid @RequestBody LoginDto loginDto) {
 
     UsernamePasswordAuthenticationToken authenticationToken =
         new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
-    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+    Authentication authentication = authenticationManagerBuilder.getObject()
+        .authenticate(authenticationToken);
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     String jwt = tokenProvider.createToken(authentication);
