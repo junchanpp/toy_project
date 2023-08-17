@@ -84,7 +84,7 @@ public class TokenUtils {
         .getBody();
   }
 
-  private static String getUserIdFromToken(String token) {
+  public static String getUserIdFromToken(String token) {
     return getClaimsFormToken(token).get("userId").toString();
   }
 }

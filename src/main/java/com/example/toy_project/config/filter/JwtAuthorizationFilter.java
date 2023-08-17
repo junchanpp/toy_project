@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -24,12 +22,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         "api/v1/code/codeList"
     );
 
-    if(notUseTokenlist.contains(request.getRequestURI())) {
+    if (notUseTokenlist.contains(request.getRequestURI())) {
       filterChain.doFilter(request, response);
       return;
     }
 
-    if(request.getMethod().equalsIgnoreCase("OPTIONS")) {
+    if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
       filterChain.doFilter(request, response);
       return;
     }
@@ -37,12 +35,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     String header = request.getHeader(AuthConstants.AUTH_HEADER);
     logger.debug("[+] header check : " + header);
 
-    try{
-      if(header == null || header.equalsIgnoreCase("")){
+    try {
+      if (header == null || header.equalsIgnoreCase("")) {
         throw new RuntimeException("[-] header is null or empty");
       }
       String token = TokenUtils.getTokenFromHeader(header);
-    }catch (Exception e) {
+      if (!TokenUtils.isValidToken(token)) {
+        throw new RuntimeException("[-] token is invalid");
+      }
+      String userId = TokenUtils.getUserIdFromToken(token);
+      logger.debug("[+] userId Check: " + userId);
+      if (userId == null || userId.equalsIgnoreCase("")) {
+        throw new RuntimeException("[-] userId is null or empty");
+      }
+      filterChain.doFilter(request, response);
+
+    } catch (Exception e) {
       logger.error("[-] header check error : " + e.getMessage());
     }
   }

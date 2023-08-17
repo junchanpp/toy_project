@@ -1,6 +1,9 @@
 package com.example.toy_project.config;
 
+import com.example.toy_project.config.filter.CustomAuthenticationFilter;
 import com.example.toy_project.config.filter.JwtAuthorizationFilter;
+import com.example.toy_project.config.handler.CustomAuthFailureHandler;
+import com.example.toy_project.config.handler.CustomAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +30,7 @@ public class WebSecurityConfig {
   public WebSecurityCustomizer webSecurityCustomizer() {
     // 정적 자원에 대해서 Security를 적용하지 않음으로 설정
     return webSecurity ->
-      webSecurity.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        webSecurity.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
   }
 
 
@@ -38,15 +41,16 @@ public class WebSecurityConfig {
         .authorizeRequests(authorizeRequests ->
             authorizeRequests.anyRequest().permitAll()
         ).addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class)
-        .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .sessionManagement(
+            httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .formLogin(AbstractHttpConfigurer::disable)
         .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
   }
 
-//  3. authenticate 의 인증 메서드를 제공하는 매니져로'Provider'의 인터페이스를 의미합니다.
+  //  3. authenticate 의 인증 메서드를 제공하는 매니져로'Provider'의 인터페이스를 의미합니다.
 //  - 과정: CustomAuthenticationFilter → AuthenticationManager(interface) → CustomAuthenticationProvider(implements)
   @Bean
   public AuthenticationManager authenticationManager() {
@@ -54,8 +58,8 @@ public class WebSecurityConfig {
   }
 
   /**
-   * 4. '인증' 제공자로 사용자의 이름과 비밀번호가 요구됩니다.
-   * - 과정: CustomAuthenticationFilter → AuthenticationManager(interface) → CustomAuthenticationProvider(implements)
+   * 4. '인증' 제공자로 사용자의 이름과 비밀번호가 요구됩니다. - 과정: CustomAuthenticationFilter →
+   * AuthenticationManager(interface) → CustomAuthenticationProvider(implements)
    *
    * @return CustomAuthenticationProvider
    */
@@ -75,13 +79,15 @@ public class WebSecurityConfig {
 
   @Bean
   public CustomAuthenticationFilter customAuthenticationFilter() {
-    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter();
+    CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(
+        authenticationManager());
     customAuthenticationFilter.setFilterProcessesUrl("/api/login");
-    customAuthenticationFilter.setAutheniticationSuccessHandler(customLoginSuccessHandler());
-    customAuthenticationFilter.setAutheniticationFailuteHandler(customLoginFailureHandler());
+    customAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());
+    customAuthenticationFilter.setAuthenticationFailureHandler(customLoginFailureHandler());
     customAuthenticationFilter.afterPropertiesSet();
     return customAuthenticationFilter;
   }
+
   @Bean
   public CustomAuthSuccessHandler customLoginSuccessHandler() {
     return new CustomAuthSuccessHandler();
