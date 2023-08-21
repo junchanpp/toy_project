@@ -8,6 +8,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -27,20 +28,22 @@ public class JwtFilter extends GenericFilterBean {
     String jwt = resolveToken(httpServletRequest);
     String requestURI = httpServletRequest.getRequestURI();
 
-    if(StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
+    if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
       var authentication = tokenProvider.getAuthentication(jwt);
       httpServletRequest.setAttribute("authentication", authentication);
-      log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
-    }else{
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+      log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(),
+          requestURI);
+    } else {
       log.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
     }
 
     chain.doFilter(request, response);
   }
 
-  private String resolveToken(HttpServletRequest request){
+  private String resolveToken(HttpServletRequest request) {
     String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-    if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
+    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);
     }
     return null;
