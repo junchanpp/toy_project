@@ -2,6 +2,7 @@ package com.example.toy_project.jwt;
 
 
 import com.example.toy_project.dto.TokenDto;
+import com.example.toy_project.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -35,13 +36,15 @@ public class TokenProvider implements InitializingBean {
   private final Long refreshTokenExpiredMilliseconds;
   private Key accessKey;
   private Key refreshKey;
+  private final RefreshTokenRepository refreshTokenRepository;
 
-  public TokenProvider(JwtProperty jwtProperty) {
+  public TokenProvider(JwtProperty jwtProperty, RefreshTokenRepository refreshTokenRepository) {
     this.accessTokenSecret = jwtProperty.getAccessTokenSecret();
     this.refreshTokenSecret = jwtProperty.getRefreshTokenSecret();
     this.accessTokenExpiredMilliseconds = 1000L * jwtProperty.getAccessTokenExpiredSeconds();
     this.refreshTokenExpiredMilliseconds =
         1000L * jwtProperty.getRefreshTokenExpiredSeconds();
+    this.refreshTokenRepository = refreshTokenRepository;
   }
 
   @Override
@@ -52,9 +55,9 @@ public class TokenProvider implements InitializingBean {
     this.refreshKey = Keys.hmacShaKeyFor(refreshKeyBytes);
   }
 
-  public TokenDto createTokenDto(Authentication authentication) {
-    String accessToken = createAccessToken(authentication);
-    String refreshToken = createRefreshToken();
+  public TokenDto createTokenDto(Authentication authentication, Long userId) {
+    String accessToken = createAccessToken(authentication, userId);
+    String refreshToken = createRefreshToken(userId);
 
     return TokenDto.builder()
         .accessToken(accessToken)
@@ -62,7 +65,7 @@ public class TokenProvider implements InitializingBean {
         .build();
   }
 
-  public String createAccessToken(Authentication authentication) {
+  public String createAccessToken(Authentication authentication, Long userId) {
     String authorities = authentication
         .getAuthorities()
         .stream()
@@ -75,17 +78,19 @@ public class TokenProvider implements InitializingBean {
     return Jwts.builder()
         .setSubject(authentication.getName())
         .claim(AUTHORITIES_KEY, authorities)
+        .claim("userId", userId)
         .signWith(accessKey, SignatureAlgorithm.HS512)
         .setExpiration(validity)
         .compact();
   }
 
-  public String createRefreshToken() {
+  public String createRefreshToken(Long userId) {
 
     long now = (new Date()).getTime();
     Date validity = new Date(now + this.refreshTokenExpiredMilliseconds);
 
     return Jwts.builder()
+        .claim("userId", userId)
         .signWith(refreshKey, SignatureAlgorithm.HS512)
         .setExpiration(validity)
         .compact();
@@ -126,10 +131,15 @@ public class TokenProvider implements InitializingBean {
     return false;
   }
 
-  public boolean validateRefreshToken(String token) {
+  public boolean validateRefreshToken(String refreshToken) {
     try {
-      Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token);
-      return true;
+      var claims = Jwts.parserBuilder().setSigningKey(refreshKey).build()
+          .parseClaimsJws(refreshToken);
+      var storedRefreshToken = refreshTokenRepository.findFirstByUserIdOrderByCreatedAtDesc(
+              Long.valueOf(claims.getBody().get("userId").toString()))
+          .orElseThrow(IllegalArgumentException::new)
+          .getRefreshToken();
+      return storedRefreshToken.equals(refreshToken);
     } catch (SecurityException | MalformedJwtException e) {
       log.info("잘못된 JWT 서명입니다.");
     } catch (ExpiredJwtException e) {

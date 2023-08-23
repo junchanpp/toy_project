@@ -35,7 +35,7 @@ public class RefreshToken {
 
   @Column(name = "refresh_token", length = 1000)
   private String refreshToken;
-  
-  @Column(name = "created_at")
-  private ZonedDateTime createdAt = ZonedDateTime.now();
+
+  @Column(name = "created_at", nullable = false, updatable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private ZonedDateTime createdAt;
 }

@@ -40,10 +40,9 @@ public class AuthController {
     Authentication authentication = authenticationManagerBuilder.getObject()
         .authenticate(authenticationToken);
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    var tokenDto = tokenProvider.createTokenDto(authentication);
-
     var user = userService.getMyUserWithAuthorities().get();
+
+    var tokenDto = tokenProvider.createTokenDto(authentication, user.getUserId());
 
     refreshTokenRepository.save(
         RefreshToken.builder()
@@ -66,15 +65,14 @@ public class AuthController {
 
     Authentication authentication = tokenProvider.getAuthentication(tokenDto.getAccessToken());
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    var newTokenDto = tokenProvider.createTokenDto(authentication);
-
     var user = userService.getMyUserWithAuthorities().get();
+
+    var newTokenDto = tokenProvider.createTokenDto(authentication, user.getUserId());
 
     refreshTokenRepository.save(
         RefreshToken.builder()
-            .userId(user.getUserId())//임시
-            .refreshToken(tokenDto.getRefreshToken())
+            .userId(user.getUserId())
+            .refreshToken(newTokenDto.getRefreshToken())
             .build());
 
     HttpHeaders httpHeaders = new HttpHeaders();
