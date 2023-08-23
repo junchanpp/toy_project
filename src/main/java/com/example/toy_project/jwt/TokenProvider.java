@@ -1,6 +1,7 @@
 package com.example.toy_project.jwt;
 
 
+import com.example.toy_project.dto.TokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +17,6 @@ import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,22 +29,40 @@ import org.springframework.stereotype.Component;
 public class TokenProvider implements InitializingBean {
 
   private static final String AUTHORITIES_KEY = "auth";
-  private final String secret;
-  private final long tokenValidityInMilliseconds;
-  private Key key;
+  private final String accessTokenSecret;
+  private final String refreshTokenSecret;
+  private final Long accessTokenExpiredMilliseconds;
+  private final Long refreshTokenExpiredMilliseconds;
+  private Key accessKey;
+  private Key refreshKey;
 
-  public TokenProvider(@Value("${jwt.secret}") String secret, @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
-    this.secret = secret;
-    this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+  public TokenProvider(JwtProperty jwtProperty) {
+    this.accessTokenSecret = jwtProperty.getAccessTokenSecret();
+    this.refreshTokenSecret = jwtProperty.getRefreshTokenSecret();
+    this.accessTokenExpiredMilliseconds = 1000L * jwtProperty.getAccessTokenExpiredSeconds();
+    this.refreshTokenExpiredMilliseconds =
+        1000L * jwtProperty.getRefreshTokenExpiredSeconds();
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    byte[] keyBytes = Decoders.BASE64.decode(secret);
-    this.key = Keys.hmacShaKeyFor(keyBytes);
+    byte[] accessKeyBytes = Decoders.BASE64.decode(accessTokenSecret);
+    this.accessKey = Keys.hmacShaKeyFor(accessKeyBytes);
+    byte[] refreshKeyBytes = Decoders.BASE64.decode(refreshTokenSecret);
+    this.refreshKey = Keys.hmacShaKeyFor(refreshKeyBytes);
   }
 
-  public String createToken(Authentication authentication){
+  public TokenDto createTokenDto(Authentication authentication) {
+    String accessToken = createAccessToken(authentication);
+    String refreshToken = createRefreshToken();
+
+    return TokenDto.builder()
+        .accessToken(accessToken)
+        .refreshToken(refreshToken)
+        .build();
+  }
+
+  public String createAccessToken(Authentication authentication) {
     String authorities = authentication
         .getAuthorities()
         .stream()
@@ -52,12 +70,23 @@ public class TokenProvider implements InitializingBean {
         .collect(Collectors.joining(","));
 
     long now = (new Date()).getTime();
-    Date validity = new Date(now + this.tokenValidityInMilliseconds);
+    Date validity = new Date(now + this.accessTokenExpiredMilliseconds);
 
     return Jwts.builder()
         .setSubject(authentication.getName())
         .claim(AUTHORITIES_KEY, authorities)
-        .signWith(key, SignatureAlgorithm.HS512)
+        .signWith(accessKey, SignatureAlgorithm.HS512)
+        .setExpiration(validity)
+        .compact();
+  }
+
+  public String createRefreshToken() {
+
+    long now = (new Date()).getTime();
+    Date validity = new Date(now + this.refreshTokenExpiredMilliseconds);
+
+    return Jwts.builder()
+        .signWith(refreshKey, SignatureAlgorithm.HS512)
         .setExpiration(validity)
         .compact();
   }
@@ -65,7 +94,7 @@ public class TokenProvider implements InitializingBean {
   public Authentication getAuthentication(String token) {
     Claims claims = Jwts
         .parserBuilder()
-        .setSigningKey(key)
+        .setSigningKey(accessKey)
         .build()
         .parseClaimsJws(token)
         .getBody();
@@ -80,17 +109,34 @@ public class TokenProvider implements InitializingBean {
     return new UsernamePasswordAuthenticationToken(principal, token, authorities);
   }
 
-  public boolean validateToken(String token) {
+  public boolean validateAccessToken(String token) {
     try {
-      Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+      Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(token);
       return true;
-    } catch (SecurityException | MalformedJwtException e){
+    } catch (SecurityException | MalformedJwtException e) {
       log.info("잘못된 JWT 서명입니다.");
-    } catch (ExpiredJwtException e){
+    } catch (ExpiredJwtException e) {
       log.info("만료된 JWT 토큰입니다.");
-    } catch (IllegalArgumentException e){
+    } catch (IllegalArgumentException e) {
       log.info("JWT 토큰이 잘못되었습니다.");
-    } catch (UnsupportedJwtException e){
+    } catch (UnsupportedJwtException e) {
+      log.info("지원되지 않는 JWT 토큰입니다.");
+    }
+
+    return false;
+  }
+
+  public boolean validateRefreshToken(String token) {
+    try {
+      Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token);
+      return true;
+    } catch (SecurityException | MalformedJwtException e) {
+      log.info("잘못된 JWT 서명입니다.");
+    } catch (ExpiredJwtException e) {
+      log.info("만료된 JWT 토큰입니다.");
+    } catch (IllegalArgumentException e) {
+      log.info("JWT 토큰이 잘못되었습니다.");
+    } catch (UnsupportedJwtException e) {
       log.info("지원되지 않는 JWT 토큰입니다.");
     }
 

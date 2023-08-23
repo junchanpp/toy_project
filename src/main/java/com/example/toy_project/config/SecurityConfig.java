@@ -2,7 +2,7 @@ package com.example.toy_project.config;
 
 import com.example.toy_project.jwt.JwtAccessDeniedHandler;
 import com.example.toy_project.jwt.JwtAuthenticationEntryPoint;
-import com.example.toy_project.jwt.JwtSecurityConfig;
+import com.example.toy_project.jwt.JwtFilter;
 import com.example.toy_project.jwt.TokenProvider;
 import javax.annotation.Resource;
 import lombok.AllArgsConstructor;
@@ -59,12 +59,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .authorizeRequests()
         .antMatchers("/api/hello").permitAll()
-        .antMatchers("/api/authenticate").permitAll()
+        .antMatchers("/api/auth/signIn").permitAll()
+        .antMatchers("/api/auth/refresh").permitAll()
         .antMatchers("/api/user/signup").permitAll()
 
         .anyRequest().authenticated()
 
         .and()
-        .apply(new JwtSecurityConfig(tokenProvider));
+        .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
   }
 }

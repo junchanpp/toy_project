@@ -25,11 +25,11 @@ public class JwtFilter extends GenericFilterBean {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     var httpServletRequest = (HttpServletRequest) request;
-    String jwt = resolveToken(httpServletRequest);
+    String accessToken = resolveAccessToken(httpServletRequest);
     String requestURI = httpServletRequest.getRequestURI();
 
-    if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-      var authentication = tokenProvider.getAuthentication(jwt);
+    if (StringUtils.hasText(accessToken) && tokenProvider.validateAccessToken(accessToken)) {
+      var authentication = tokenProvider.getAuthentication(accessToken);
       httpServletRequest.setAttribute("authentication", authentication);
       SecurityContextHolder.getContext().setAuthentication(authentication);
       log.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(),
@@ -41,7 +41,7 @@ public class JwtFilter extends GenericFilterBean {
     chain.doFilter(request, response);
   }
 
-  private String resolveToken(HttpServletRequest request) {
+  private String resolveAccessToken(HttpServletRequest request) {
     String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
     if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
       return bearerToken.substring(7);

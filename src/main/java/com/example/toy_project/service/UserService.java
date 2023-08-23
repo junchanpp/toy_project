@@ -54,4 +54,5 @@ public class UserService {
     return SecurityUtil.getCurrentUsername()
         .flatMap(userRepository::findOneWithAuthoritiesByUsername);
   }
+
 }
