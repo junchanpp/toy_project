@@ -5,7 +5,7 @@ logging:
 spring:
   rabbitmq:
     host: rabbitmq-blue
-    port: 5673
+    port: 5672
     username: guest
     password: guest
 
