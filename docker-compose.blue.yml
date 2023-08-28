@@ -16,7 +16,7 @@ services:
     image: rabbitmq:3-management
     ports:
       - "5673:5672"
-      - "15672:15672"
+      - "15673:15672"
     container_name: rabbitmq-blue
 networks:
   our_net:
