@@ -1,0 +1,15 @@
+logging:
+  level:
+    root: info
+
+spring:
+  rabbitmq:
+    host: rabbitmq-blue
+    port: 5673
+    username: guest
+    password: guest
+
+rabbitmq:
+  queue.name: sample.queue
+  exchange.name: sample.exchange
+  routing.key: sample.key

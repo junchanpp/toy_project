@@ -6,3 +6,19 @@ services:
     ports:
       - "8082:8080"
     container_name: spring-green
+    environment:
+      - spring.profiles.active=dev-green
+
+    networks:
+      - our_net
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5674:5672"
+      - "15672:15672"
+    container_name: rabbitmq-green
+    networks:
+      - our_net
+networks:
+  our_net:
+    driver: bridge

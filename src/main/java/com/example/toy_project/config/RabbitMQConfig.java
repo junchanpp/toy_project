@@ -48,11 +48,13 @@ public class RabbitMQConfig {
     return new DirectExchange(exchangeName);
   }
 
+  //사용할 큐 이름과 라우팅 키를 바인딩
   @Bean
   public Binding binding(Queue queue, DirectExchange exchange) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey);
   }
 
+  //rabbitmq 연결
   @Bean
   public ConnectionFactory connectionFactory() {
     CachingConnectionFactory connectionFactory = new CachingConnectionFactory();

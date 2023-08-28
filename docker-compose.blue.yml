@@ -10,3 +10,14 @@ services:
       - "8081:8080"
     # 컨테이너의 이름
     container_name: spring-blue
+    environment:
+      - spring.profiles.active=dev-blue
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5673:5672"
+      - "15672:15672"
+    container_name: rabbitmq-blue
+networks:
+  our_net:
+    driver: bridge
