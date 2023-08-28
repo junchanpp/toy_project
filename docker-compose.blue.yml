@@ -12,12 +12,17 @@ services:
     container_name: spring-blue
     environment:
       - spring.profiles.active=dev-blue
+    # 컨테이너가 속한 네트워크
+    networks:
+      - our_net
   rabbitmq:
     image: rabbitmq:3-management
     ports:
       - "5673:5672"
       - "15673:15672"
     container_name: rabbitmq-blue
+    networks:
+      - our_net
 networks:
   our_net:
     driver: bridge
