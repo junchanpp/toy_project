@@ -2,7 +2,7 @@
 loadmap.sh를 보며 기술 하나하나 정복해보자
 
 
-
+- CI/CD https://github.com/junchanpp/cicd-test
 - JWT(refresh token x) https://github.com/junchanpp/toy_project/tree/authentication/JWT
 - JWT(refresh token o) https://github.com/junchanpp/toy_project/tree/authentication/JWT-add-refresh-token
 
