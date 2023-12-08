@@ -1,0 +1,7 @@
+[submodule "toy-project-privates"]
+	path = src/main/resources/config
+	url = https://github.com/junchanpp/toy-project-privates.git
+
+
+
+
