@@ -39,6 +39,7 @@ public class MembershipService {
     }
 
     public List<GetMemberShipListResponse> getMemberShipList(String userId) {
-        return GetMemberShipListResponse.from(membershipRepository.findByUserId(userId));
+        return membershipRepository.findByUserId(userId).stream().map(
+                GetMemberShipListResponse::from).toList();
     }
 }
