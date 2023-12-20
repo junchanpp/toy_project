@@ -3,9 +3,11 @@ package com.example.toy_project.controller;
 import static com.example.toy_project.util.MembershipConstants.USER_ID_HEADER;
 
 import com.example.toy_project.dto.request.AddMembershipRequest;
+import com.example.toy_project.dto.request.GetMemberShipResponse;
 import com.example.toy_project.dto.resopnse.AddMembershipResponse;
 import com.example.toy_project.service.MembershipService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,8 @@ public class MembershipController {
     }
 
     @GetMapping(value = "/api/v1/memberships", produces = "application/json")
-    public ResponseEntity<?> getMemberships(@RequestHeader(USER_ID_HEADER) final String userId) {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<List<GetMemberShipResponse>> getMemberships(
+            @RequestHeader(USER_ID_HEADER) final String userId) {
+        return ResponseEntity.ok(membershipService.getMemberShipList(userId));
     }
 }

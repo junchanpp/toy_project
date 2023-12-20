@@ -1,6 +1,6 @@
 package com.example.toy_project.service;
 
-import com.example.toy_project.dto.request.GetMemberShipListResponse;
+import com.example.toy_project.dto.request.GetMemberShipResponse;
 import com.example.toy_project.dto.resopnse.AddMembershipResponse;
 import com.example.toy_project.entity.Membership;
 import com.example.toy_project.repository.MembershipRepository;
@@ -38,8 +38,8 @@ public class MembershipService {
                 .build();
     }
 
-    public List<GetMemberShipListResponse> getMemberShipList(String userId) {
+    public List<GetMemberShipResponse> getMemberShipList(String userId) {
         return membershipRepository.findByUserId(userId).stream().map(
-                GetMemberShipListResponse::from).toList();
+                GetMemberShipResponse::from).toList();
     }
 }

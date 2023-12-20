@@ -5,18 +5,18 @@ import com.example.toy_project.util.MembershipType;
 import lombok.Getter;
 
 @Getter
-public class GetMemberShipListResponse {
+public class GetMemberShipResponse {
 
     private final MembershipType membershipType;
     private final Integer point;
 
-    private GetMemberShipListResponse(MembershipType membershipType, Integer point) {
+    private GetMemberShipResponse(MembershipType membershipType, Integer point) {
         this.membershipType = membershipType;
         this.point = point;
     }
 
-    public static GetMemberShipListResponse from(Membership membership) {
-        return new GetMemberShipListResponse(membership.getMembershipType(), membership.getPoint());
+    public static GetMemberShipResponse from(Membership membership) {
+        return new GetMemberShipResponse(membership.getMembershipType(), membership.getPoint());
     }
 
 }

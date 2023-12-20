@@ -19,9 +19,5 @@
 ## TODO List
 
 - [x] userId로 내가 가진 모든 멤버십을 조회하는 repository의 메서드를 구현한다.
-- [x] 조회했을 때 아무것도 없는 경우와 하나 이상 있는 경우를 구분하여 테스트한다.
 - [x] userId로 내가 가진 모든 멤버십을 조회하는 service의 메서드를 구현한다.
-- [x] service가 entity가 아닌 dto를 반환하도록 리팩토링한다.
-- [ ] **_userId로 멤버십 전체 조회 API를 구현한다._**
-- [x] userId가 없는 경우 400에러를 발생한다.
-- [ ] **_userId가 있는 경우 200 status code와 함께 멤버십 리스트를 반환한다._**
+- [x] userId로 멤버십 전체 조회 API를 구현한다.

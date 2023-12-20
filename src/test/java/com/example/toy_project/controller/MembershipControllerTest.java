@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.toy_project.dto.request.AddMembershipRequest;
-import com.example.toy_project.dto.request.GetMemberShipListResponse;
+import com.example.toy_project.dto.request.GetMemberShipResponse;
 import com.example.toy_project.dto.resopnse.AddMembershipResponse;
 import com.example.toy_project.entity.Membership;
 import com.example.toy_project.service.MembershipService;
@@ -160,9 +160,9 @@ public class MembershipControllerTest {
         // given
         final String url = "/api/v1/memberships";
         when(membershipService.getMemberShipList("userId")).thenReturn(
-                List.of(GetMemberShipListResponse.from(Membership.builder().build()),
-                        GetMemberShipListResponse.from(Membership.builder().build()),
-                        GetMemberShipListResponse.from(Membership.builder().build()))
+                List.of(GetMemberShipResponse.from(Membership.builder().build()),
+                        GetMemberShipResponse.from(Membership.builder().build()),
+                        GetMemberShipResponse.from(Membership.builder().build()))
         );
 
         // when
