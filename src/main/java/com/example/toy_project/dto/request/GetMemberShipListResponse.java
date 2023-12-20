@@ -15,8 +15,8 @@ public class GetMemberShipListResponse {
         this.point = point;
     }
 
-    public static GetMemberShipListResponse from(Membership byUserId) {
-        return new GetMemberShipListResponse(byUserId.getMembershipType(), byUserId.getPoint());
+    public static GetMemberShipListResponse from(Membership membership) {
+        return new GetMemberShipListResponse(membership.getMembershipType(), membership.getPoint());
     }
 
 }
