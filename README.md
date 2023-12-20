@@ -18,6 +18,6 @@
 
 ## TODO List
 
-- [ ] userId로 내가 가진 모든 멤버십을 조회하는 repository의 메서드를 구현한다.
+- [ ] **_userId로 내가 가진 모든 멤버십을 조회하는 repository의 메서드를 구현한다._**
 - [ ] userId로 내가 가진 모든 멤버십을 조회하는 service의 메서드를 구현한다.
 - [ ] userId로 멤버십 전체 조회 API를 구현한다.
