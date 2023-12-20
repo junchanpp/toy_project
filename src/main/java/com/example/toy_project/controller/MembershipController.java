@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,17 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MembershipController {
 
-  private final MembershipService membershipService;
+    private final MembershipService membershipService;
 
-  @PostMapping(value = "/api/v1/memberships", consumes = "application/json", produces = "application/json")
-  public ResponseEntity<AddMembershipResponse> addMembership(
-      @RequestHeader(USER_ID_HEADER) final String userId,
-      @RequestBody @Valid final AddMembershipRequest addMembershipRequest) {
+    @PostMapping(value = "/api/v1/memberships", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<AddMembershipResponse> addMembership(
+            @RequestHeader(USER_ID_HEADER) final String userId,
+            @RequestBody @Valid final AddMembershipRequest addMembershipRequest) {
 
-    final var response = membershipService.addMembership(userId,
-        addMembershipRequest.getMembershipType(),
-        addMembershipRequest.getPoint());
+        final var response = membershipService.addMembership(userId,
+                addMembershipRequest.getMembershipType(),
+                addMembershipRequest.getPoint());
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
-  }
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping(value = "/api/v1/memberships", produces = "application/json")
+    public ResponseEntity<?> getMemberships(@RequestHeader(USER_ID_HEADER) final String userId) {
+        return ResponseEntity.ok(null);
+    }
 }
