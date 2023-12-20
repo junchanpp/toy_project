@@ -7,3 +7,17 @@
 [TDD 구현 예제 3](https://mangkyu.tistory.com/184)
 까지는 보고 따라했으며,
 [TDD 구현 예제 4](https://mangkyu.tistory.com/185) 부터는 직접 구현해보았다.
+
+1. 멤버십 전체 조회 API 구현
+
+기능
+
+- 내가 가진 모든 멤버십을 조회한다.
+- 요청: 사용자 식별값
+- 응답: {멤버십 ID, 멤버십 이름, 포인트, 가입 일시}의 멤버십 리스트
+
+## TODO List
+
+- [ ] userId로 내가 가진 모든 멤버십을 조회하는 repository의 메서드를 구현한다.
+- [ ] userId로 내가 가진 모든 멤버십을 조회하는 service의 메서드를 구현한다.
+- [ ] userId로 멤버십 전체 조회 API를 구현한다.
