@@ -6,6 +6,7 @@ import com.example.toy_project.repository.MembershipRepository;
 import com.example.toy_project.util.MembershipErrorResult;
 import com.example.toy_project.util.MembershipException;
 import com.example.toy_project.util.MembershipType;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,26 +14,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MembershipService {
 
-  private final MembershipRepository membershipRepository;
+    private final MembershipRepository membershipRepository;
 
-  public AddMembershipResponse addMembership(String userId, MembershipType membershipType,
-      Integer point) {
-    final Membership membership = membershipRepository
-        .findByUserIdAndMembershipType(userId, membershipType);
-    if (membership != null) {
-      throw new MembershipException(MembershipErrorResult.DUPLICATED_MEMBERSHIP_REGISTER);
+    public AddMembershipResponse addMembership(String userId, MembershipType membershipType,
+            Integer point) {
+        final Membership membership = membershipRepository
+                .findByUserIdAndMembershipType(userId, membershipType);
+        if (membership != null) {
+            throw new MembershipException(MembershipErrorResult.DUPLICATED_MEMBERSHIP_REGISTER);
+        }
+        final Membership newMembership = Membership.builder()
+                .userId(userId)
+                .membershipType(membershipType)
+                .point(point)
+                .build();
+
+        final var savedMembership = membershipRepository.save(newMembership);
+
+        return AddMembershipResponse.builder()
+                .id(savedMembership.getId())
+                .membershipType(savedMembership.getMembershipType())
+                .build();
     }
-    final Membership newMembership = Membership.builder()
-        .userId(userId)
-        .membershipType(membershipType)
-        .point(point)
-        .build();
 
-    final var savedMembership = membershipRepository.save(newMembership);
-
-    return AddMembershipResponse.builder()
-        .id(savedMembership.getId())
-        .membershipType(savedMembership.getMembershipType())
-        .build();
-  }
+    public List<Membership> getMemberShipList(String userId) {
+        return membershipRepository.findByUserId(userId);
+    }
 }
