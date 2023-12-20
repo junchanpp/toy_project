@@ -63,4 +63,22 @@ public class MembershipRepositoryTest {
         //then
         assertThat(result).isEmpty();
     }
+
+    @Test
+    public void 멤버십조회_있음() {
+        //given
+        var userId = "userId";
+        final Membership membership1 = Membership.builder().userId(userId)
+                .membershipType(MembershipType.NAVER).point(10000).build();
+        final Membership membership2 = Membership.builder().userId(userId)
+                .membershipType(MembershipType.KAKAO).point(100).build();
+        membershipRepository.saveAll(List.of(membership1, membership2));
+
+        //when
+        final List<Membership> result = membershipRepository.findByUserId(userId);
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getUserId()).isEqualTo(userId);
+    }
 }
