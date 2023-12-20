@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.example.toy_project.dto.request.GetMemberShipListResponse;
 import com.example.toy_project.dto.resopnse.AddMembershipResponse;
 import com.example.toy_project.entity.Membership;
 import com.example.toy_project.repository.MembershipRepository;
@@ -71,7 +72,7 @@ class MembershipServiceTest {
         doReturn(List.of(membership())).when(membershipRepository).findByUserId(userId);
 
         //when
-        final List<Membership> result = target.getMemberShipList(userId);
+        final List<GetMemberShipListResponse> result = target.getMemberShipList(userId);
 
         //then
         assertThat(result).isNotNull();
