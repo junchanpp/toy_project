@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/testdb2
+    username: postgres
+    password: password
+  jpa:
+    #    database: postgresql
+    database-platform:
+      org.hibernate.spatial.dialect.postgis.PostgisDialect
+    hibernate:
+      ddl-auto: create-drop
+      properties:
+        hibernate:
+          format_sql: true
+          show_sql: true
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    root: debug
