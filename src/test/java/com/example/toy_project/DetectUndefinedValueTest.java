@@ -2,6 +2,7 @@ package com.example.toy_project;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -14,6 +15,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Nested;
@@ -122,9 +124,38 @@ public class DetectUndefinedValueTest {
             assertEquals(result, object);
         }
 
-        private record CustomRequestForJsonNullable(JsonNullable<String> name,
-                                                    JsonNullable<String> nickname) {
+        @Test
+        void userJsonNullableWithEmptyStringAndNull() throws JsonProcessingException {
+            var json = "{\"nickname\":null}";
+            var user = new User("test_name", "test_nickname");
+            CustomRequestForJsonNullable request = objectMapper
+                    .readerWithView(CustomRequestForJsonNullable.class)
+                    .forType(CustomRequestForJsonNullable.class)
+                    .readValue(json);// spring에서 처리해줌. 신경 x
 
+            if (request.name().isPresent()) {
+                user.setName(request.name().get());
+            }
+            if (request.nickname().isPresent()) {
+                user.setNickname(request.nickname().get());
+            }
+
+            assertEquals(user.name, "test_name");
+            assertNull(user.nickname);
+        }
+
+        public record CustomRequestForJsonNullable(JsonNullable<String> name,
+                                                   JsonNullable<String> nickname) {
+
+        }
+
+        @Getter
+        @Setter
+        @AllArgsConstructor
+        private static class User {
+
+            private String name;
+            private String nickname;
         }
     }
 
